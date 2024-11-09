@@ -1,0 +1,8 @@
+# Plugins
+acf-image-size-select
+menu-duplicator
+query-monitor-image-sizes
+
+# Development
+.env
+.development/wordpress
