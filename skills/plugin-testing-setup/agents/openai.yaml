@@ -1,0 +1,4 @@
+interface:
+  display_name: "Plugin Testing Setup"
+  short_description: "Explain this WordPress plugin workspace"
+  default_prompt: "Use $plugin-testing-setup to explain how this WordPress plugin testing workspace is organized."

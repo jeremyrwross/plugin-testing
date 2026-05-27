@@ -3,6 +3,9 @@ acf-image-size-select
 menu-duplicator
 query-monitor-image-sizes
 
+# Plugins
+plugins/*
+
 # Development
 .env
 .development/wordpress
