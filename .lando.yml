@@ -1,0 +1,71 @@
+name: plugintesting
+
+proxy:
+  appserver:
+    - plugintesting.lndo.site
+
+services:
+  appserver:
+    api: 3
+    type: lando
+    ssl: true
+    sslExpose: false
+    overrides:
+      build: ./.development
+      entrypoint: docker-entrypoint.sh
+      command: apache2-foreground
+      ports:
+        - '8082:80'
+      volumes:
+        - ./.development/wordpress:/var/www/html
+        - ./acf-image-size-select:/var/www/html/wp-content/plugins/acf-image-size-select
+        - ./menu-duplicator:/var/www/html/wp-content/plugins/menu-duplicator
+        - ./query-monitor-image-sizes:/var/www/html/wp-content/plugins/query-monitor-image-sizes
+      environment:
+        WORDPRESS_DB_HOST: db
+        WORDPRESS_DB_USER: root
+        WORDPRESS_DB_PASSWORD: root
+        WORDPRESS_DB_NAME: wordpress
+        WP_ENVIRONMENT_TYPE: local
+        WORDPRESS_DEBUG: '1'
+        WORDPRESS_CONFIG_EXTRA: |
+          define( 'WP_DEBUG_LOG', '/var/www/html/debug.log' );
+          define( 'SCRIPT_DEBUG', true );
+          @ini_set( 'log_errors', 'On' );
+          @ini_set( 'error_log', '/var/www/html/debug.log' );
+
+  db:
+    api: 3
+    type: lando
+    app_mount: false
+    volumes:
+      wordpress_data: {}
+    services:
+      volumes:
+        - wordpress_data:/var/lib/mysql
+    overrides:
+      image: mariadb:11.8
+      command: mariadbd
+      entrypoint: docker-entrypoint.sh
+      environment:
+        MYSQL_ROOT_PASSWORD: root
+        MYSQL_DATABASE: wordpress
+
+  adminer:
+    api: 3
+    type: lando
+    app_mount: false
+    moreHttpPorts:
+      - 8080
+    overrides:
+      image: adminer:latest
+      command: [php, -S, '[::]:8080', -t, /var/www/html]
+      entrypoint: [entrypoint.sh, docker-php-entrypoint]
+      ports:
+        - '8083:8080'
+
+tooling:
+  wp:
+    service: appserver
+    user: www-data
+    cmd: wp --path=/var/www/html
